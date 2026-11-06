@@ -3,7 +3,9 @@
 Import-Module Chocolatey-AU
 
 function global:au_GetLatest {
-  $release = Invoke-RestMethod -UseBasicParsing 'https://api.github.com/repos/gopher64/gopher64/releases/latest'
+  $headers = @{ 'User-Agent' = 'chocolatey-packages-au' }
+  if ($env:GITHUB_TOKEN) { $headers.Authorization = "Bearer $env:GITHUB_TOKEN" }  # avoids API rate limits in CI
+  $release = Invoke-RestMethod -UseBasicParsing -Headers $headers 'https://api.github.com/repos/gopher64/gopher64/releases/latest'
   $tag     = $release.tag_name
   $version = $tag.TrimStart('v')
 

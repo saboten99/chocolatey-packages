@@ -1,0 +1,110 @@
+name: Packages
+
+# - On every push / pull request: pack each package in automatic/ and test that it
+#   installs and uninstalls cleanly on Windows.
+# - Daily (and on manual run): check upstream for new versions with Chocolatey-AU,
+#   test the result, commit the version bump, and push new versions to the
+#   Chocolatey community repository (only if the CHOCO_API_KEY secret is set).
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+  schedule:
+    - cron: '23 14 * * *'   # daily, 14:23 UTC
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Push the current package versions to Chocolatey (needs CHOCO_API_KEY secret)'
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: packages
+  cancel-in-progress: false
+
+jobs:
+  packages:
+    runs-on: windows-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      CHOCO_API_KEY: ${{ secrets.CHOCO_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for upstream updates
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          choco install chocolatey-au -y --no-progress
+          Import-Module Chocolatey-AU
+          foreach ($dir in Get-ChildItem automatic -Directory) {
+            if (-not (Test-Path "$($dir.FullName)\update.ps1")) { continue }
+            Write-Host "=== Checking $($dir.Name) ==="
+            Push-Location $dir.FullName
+            try { & .\update.ps1 } finally { Pop-Location }
+          }
+          git status --short
+
+      - name: Pack and test install/uninstall
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $out = New-Item -ItemType Directory -Force "$env:RUNNER_TEMP\nupkgs"
+          foreach ($dir in Get-ChildItem automatic -Directory) {
+            $nuspec = Get-ChildItem $dir.FullName -Filter *.nuspec | Select-Object -First 1
+            if (-not $nuspec) { continue }
+            $id = $dir.Name
+            Write-Host "=== $id ==="
+            choco pack $nuspec.FullName --output-directory $out
+            if ($LASTEXITCODE) { throw "choco pack failed for $id" }
+
+            choco install $id --source "$out;https://community.chocolatey.org/api/v2/" -y --no-progress
+            if ($LASTEXITCODE) { throw "choco install failed for $id" }
+
+            $test = Join-Path $dir.FullName 'test.ps1'
+            if (Test-Path $test) { & $test -Phase installed }
+
+            choco uninstall $id -y --no-progress
+            if ($LASTEXITCODE) { throw "choco uninstall failed for $id" }
+            if (Test-Path $test) { & $test -Phase uninstalled }
+          }
+          Get-ChildItem $out
+
+      - name: Commit version bumps
+        if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+        id: commit
+        shell: bash
+        run: |
+          git add -A automatic
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "No updates."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          msg="Update packages: $(git diff --cached --name-only -- 'automatic/*/*.nuspec' | cut -d/ -f2 | sort -u | paste -sd, -)"
+          git commit -m "$msg"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Push to Chocolatey
+        if: env.CHOCO_API_KEY != '' && (steps.commit.outputs.changed == 'true' || inputs.publish)
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          foreach ($pkg in Get-ChildItem "$env:RUNNER_TEMP\nupkgs" -Filter *.nupkg) {
+            Write-Host "=== Pushing $($pkg.Name) ==="
+            $log = choco push $pkg.FullName --source https://push.chocolatey.org/ --api-key $env:CHOCO_API_KEY 2>&1 | Out-String
+            Write-Host $log
+            if ($LASTEXITCODE) {
+              # Re-pushing a version that is already submitted is not an error for us.
+              if ($log -match '409|already exists|Conflict') { Write-Host "Already submitted, skipping." }
+              else { throw "choco push failed for $($pkg.Name)" }
+            }
+          }
