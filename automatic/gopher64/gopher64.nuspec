@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>gopher64</id>
+    <version>1.1.42</version>
+    <packageSourceUrl>https://github.com/saboten99/chocolatey-packages/tree/master/automatic/gopher64</packageSourceUrl>
+    <owners>saboten99</owners>
+    <title>Gopher64</title>
+    <authors>Logan McNaughton (loganmc10)</authors>
+    <projectUrl>https://github.com/gopher64/gopher64</projectUrl>
+    <iconUrl>https://cdn.jsdelivr.net/gh/gopher64/gopher64@main/data/icon/gopher64_256x256.png</iconUrl>
+    <licenseUrl>https://github.com/gopher64/gopher64/blob/main/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/gopher64/gopher64</projectSourceUrl>
+    <docsUrl>https://github.com/gopher64/gopher64/wiki</docsUrl>
+    <bugTrackerUrl>https://github.com/gopher64/gopher64/issues</bugTrackerUrl>
+    <releaseNotes>https://github.com/gopher64/gopher64/releases/tag/v1.1.42</releaseNotes>
+    <tags>gopher64 n64 nintendo-64 emulator emulation netplay retroachievements games foss cross-platform</tags>
+    <summary>A cross-platform Nintendo 64 emulator with netplay, upscaling and RetroAchievements.</summary>
+    <description><![CDATA[Gopher64 is a cross-platform Nintendo 64 emulator.
+
+## Features
+* Netplay (P2P online play)
+* Homebrew support
+* Upscaling
+* CRT shader
+* Emulated CPU overclocking
+* Cheats
+* Savestates
+* RetroAchievements
+
+## Package notes
+* Installs the official signed standalone executable for your architecture (x64 or ARM64) and adds a `gopher64` command plus a Start Menu shortcut.
+* Settings, saves and savestates are kept in your user profile, so they survive upgrades and uninstalls.
+* To pass a ROM from the command line: `gopher64 "C:\path\to\rom.z64"`
+
+See the [wiki](https://github.com/gopher64/gopher64/wiki) for default keyboard/gamepad mappings and the netplay guide.
+]]></description>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+  </files>
+</package>
