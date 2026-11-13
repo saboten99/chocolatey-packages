@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
   <metadata>
     <id>gopher64</id>
-    <version>1.2.0</version>
+    <version>1.2.1</version>
     <packageSourceUrl>https://github.com/saboten99/chocolatey-packages/tree/master/automatic/gopher64</packageSourceUrl>
     <owners>saboten99</owners>
     <title>Gopher64</title>
@@ -14,7 +14,7 @@
     <projectSourceUrl>https://github.com/gopher64/gopher64</projectSourceUrl>
     <docsUrl>https://github.com/gopher64/gopher64/wiki</docsUrl>
     <bugTrackerUrl>https://github.com/gopher64/gopher64/issues</bugTrackerUrl>
-    <releaseNotes>https://github.com/gopher64/gopher64/releases/tag/v1.2.0</releaseNotes>
+    <releaseNotes>https://github.com/gopher64/gopher64/releases/tag/v1.2.1</releaseNotes>
     <tags>gopher64 n64 nintendo-64 emulator emulation netplay retroachievements games foss cross-platform</tags>
     <summary>A cross-platform Nintendo 64 emulator with netplay, upscaling and RetroAchievements.</summary>
     <description><![CDATA[Gopher64 is a cross-platform Nintendo 64 emulator.
