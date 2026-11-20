@@ -3,11 +3,11 @@
 $toolsDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
 $exePath  = Join-Path $toolsDir 'gopher64.exe'
 
-$urlX64      = 'https://github.com/gopher64/gopher64/releases/download/v1.2.1/gopher64-windows-x86_64.exe'
-$checksumX64 = '6aa70afb9e168e6d0159cc676332ea36c55aa947082590383c35db072359926b'
+$urlX64      = 'https://github.com/gopher64/gopher64/releases/download/v1.2.2/gopher64-windows-x86_64.exe'
+$checksumX64 = '539e12d139abd7e0b5cc8b78016c0cefb3aec5eaefdcfc501d66b5a30b03ba70'
 
-$urlArm64      = 'https://github.com/gopher64/gopher64/releases/download/v1.2.1/gopher64-windows-aarch64.exe'
-$checksumArm64 = 'c500dc062f949e34fdd5301d67dcd7d3d97f31efb1ea77ae7d529ec94a06a3cc'
+$urlArm64      = 'https://github.com/gopher64/gopher64/releases/download/v1.2.2/gopher64-windows-aarch64.exe'
+$checksumArm64 = 'cfb8480c2f45817c6b2a8f94d1f7f02895c14fcabf50363c558cf03dbf520bd7'
 
 # Read the native OS architecture from the registry; $env:PROCESSOR_ARCHITECTURE
 # reports AMD64 when this script runs under x64 emulation on an ARM64 machine.
